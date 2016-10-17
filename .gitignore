@@ -1,0 +1,22 @@
+# OSX hidden files
+.DS_Store
+
+# IDE Specific file
+.idea
+*.iml
+
+# Node runtime artifacts
+node_modules
+npm-debug.log
+
+# Test Coverage Reports
+test/coverage
+
+# Compiled Typescript
+**/*.js
+**/*.js.map
+**/*.d.ts
+
+# Typings
+!/typings/**/*.d.ts
+

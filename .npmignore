@@ -1,0 +1,17 @@
+# TS files and build artifacts
+**/*.ts
+**/*.js.map
+
+# Include type definitions
+!**/*.d.ts
+
+# Tests and utils
+**/*.spec.*
+test/
+
+
+# Ignore config files
+.editorconfig
+.gitlab-ci.yml
+tsconfig.json
+tslint.json

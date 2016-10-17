@@ -1,0 +1,17 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "object-literal-sort-keys": false,
+    "ordered-imports": false
+  },
+  "rulesDirectory": []
+}

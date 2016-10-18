@@ -100,7 +100,7 @@ export class Config {
 
 The above method, will be triggered when a `Logger` is requested from the `container`. The method return type is the key that is used by default to register the dependency, it can be overridden by an explicit key provided as the first parameter of the decorator. The second parameter of the decorator will signal if the dependency should be registered with the _parent_ container or the _current_ container.
 
-_Note should be fully backwards compatible with aurelia-dependency-injection and should work as expected when used on classes_.
+_Note: This should be fully backwards compatible with aurelia-dependency-injection and should work as expected when used on classes_.
 
 `transient(key?: any)`: This will mark a `method` as a factory that will provide a _transient_ dependency that is registered either as the return type of the method or as the type of the key passed as the first argument to the decorator. E.g:
 
@@ -113,4 +113,4 @@ _Note should be fully backwards compatible with aurelia-dependency-injection and
 
 The above method, will be triggered any time a `Logger` is requested from the `container`. The decorator is passed an explicit key of type `Logger` that is used to register the dependency, overriding the return type (`MyOtherLogger`) of the factory.
 
-_Note should be fully backwards compatible with aurelia-dependency-injection and should work as expected when used on classes_.
+_Note: This should be fully backwards compatible with aurelia-dependency-injection and should work as expected when used on classes_.

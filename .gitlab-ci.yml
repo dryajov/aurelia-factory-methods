@@ -1,0 +1,29 @@
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - test
+  - publish
+
+run_tests:
+  stage: test
+  script:
+    - CI=false npm install
+  tags:
+    - cis-typescript
+    - cis-node-6
+    - cis-rhel-6
+
+publish:
+  stage: publish
+  script:
+    - CI=false npm install
+    - npm run publish:ci
+  only:
+    - next
+    - master
+  tags:
+    - cis-typescript
+    - cis-node-6
+    - cis-rhel-6

@@ -1,6 +1,6 @@
 {
   "name": "aurelia-factory-methods",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Enable @singleton and @transient decorators on class methods",
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",

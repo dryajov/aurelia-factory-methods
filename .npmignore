@@ -12,6 +12,6 @@ test/
 
 # Ignore config files
 .editorconfig
-.gitlab-ci.yml
+circle.yml
 tsconfig.json
 tslint.json

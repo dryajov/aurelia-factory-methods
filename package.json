@@ -10,8 +10,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf lib/*.js lib/*.map lib/*.d.ts lib/**/*.js lib/**/*.map lib/**/*.d.ts",
-    "test": "./node_modules/.bin/mocha test/*.spec.js"
+    "clean": "rm -rf lib/*.{map,d.ts,js} test/*.{map,d.ts,js}",
+    "test": "npm run clean && npm run build && ./node_modules/.bin/mocha test/*.spec.js"
   },
   "author": "Dmitiry Ryajov <dryajov@gmail.com>",
   "license": "MIT",

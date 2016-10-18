@@ -15,7 +15,7 @@
   },
   "author": "Dmitiry Ryajov <dryajov@gmail.com>",
   "license": "MIT",
-  "tags": [
+  "keywords": [
     "factory methods",
     "factory",
     "decoupled registrtion",

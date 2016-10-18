@@ -9,7 +9,7 @@
     "url": "git@github.com:dryajov/aurelia-config-methods.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node_modules/.bin/tsc",
     "clean": "rm -rf lib/*.{map,d.ts,js} test/*.{map,d.ts,js}",
     "test": "npm run clean && npm run build && ./node_modules/.bin/mocha test/*.spec.js"
   },
@@ -39,6 +39,7 @@
     "mocha": "^3.1.2",
     "mongoose": "^4.5.9",
     "sinon": "^1.17.6",
-    "ts-node": "^1.3.0"
+    "ts-node": "^1.3.0",
+    "typescript": "^2.0.3"
   }
 }

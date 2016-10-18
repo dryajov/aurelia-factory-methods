@@ -17,7 +17,7 @@ export function registration(value: Registration & {key: any}): any {
       value.factoryFn = descriptor.value;
       value.targetClass = target;
       // TODO: move key to metadata
-      target = metadata.get('design:returntype', target, value.key || key);
+      target = value.key || metadata.get('design:returntype', target, key);
     }
 
     return aureliaRegistration(value as AureliaRegistration)(target);

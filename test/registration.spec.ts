@@ -1,10 +1,17 @@
 import 'reflect-metadata';
 
+import chai = require('chai');
+import chaiAsPromissed = require('chai-as-promised');
+
+chai.use(chaiAsPromissed);
+
 import {assert}         from 'chai';
 import {SinonSpy, spy}  from 'sinon';
 
-import {Container, autoinject}  from 'aurelia-dependency-injection';
-import {singleton, transient}   from '../lib';
+import {Container, autoinject, inject}  from 'aurelia-dependency-injection';
+import {singleton, transient}   from '../lib/registration';
+
+import {Hello} from './config-class';
 
 describe('Singleton Registration', () => {
   let container: Container;
@@ -62,8 +69,8 @@ describe('Singleton Registration', () => {
   });
 
   it('should inject only once', () => {
-    assert.equal(Logger.counter, 1, 'Logger counter should equal 1');
-    assert.equal(Connection.counter, 1, 'Connection counter should equal 1');
+    assert.equal(Logger.counter, 1, 'Logger counter should equal no-factory-methods');
+    assert.equal(Connection.counter, 1, 'Connection counter should equal no-factory-methods');
   });
 });
 
@@ -183,5 +190,151 @@ describe('Dependencies in factory methods', () => {
 
   it('should inject Logger into getConnection', () => {
     assert.isOk(loggerSpy.called, 'Logger should have been created');
+  });
+});
+
+describe('Override key', () => {
+  let container: Container;
+  let app: App;
+
+  class Logger {
+    public static counter: number = 0;
+    public name: string = 'Logger';
+
+    constructor() {
+      Logger.counter++;
+    }
+  }
+
+  class AnotherLogger extends Logger {
+    constructor() {
+      super();
+      this.name = 'AnotherLogger';
+    }
+  }
+
+  class Connection {
+    public static counter: number = 0;
+    public name: string = 'Connection';
+
+    constructor() {
+      Connection.counter++;
+    }
+  }
+
+  class AnotherConnection extends Connection {
+    constructor() {
+      super();
+      super.name = 'AnotherConnection';
+    }
+  }
+
+  @autoinject()
+  class App {
+    constructor(public connection: AnotherConnection, public logger: AnotherLogger) {
+    }
+  }
+
+  class Config {
+    @singleton(AnotherLogger)
+    public getLogger(): Logger {
+      return new AnotherLogger();
+    }
+
+    @singleton(AnotherConnection)
+    public getConnection(): Connection {
+      return new AnotherConnection();
+    }
+  }
+
+  before(() => {
+    Logger.counter = 0;
+    Connection.counter = 0;
+  });
+
+  container = new Container();
+  beforeEach(() => {
+    app = container.get(App);
+  });
+
+  it('Key should override return value type', () => {
+    assert.instanceOf(app.logger, AnotherLogger, 'app.logger should be an instance of Logger');
+    assert.instanceOf(app.connection, AnotherConnection, 'app.connection should be an instance of Connection');
+  });
+});
+
+describe('Promise inject', () => {
+  let container: Container;
+  let app: App;
+
+  class Logger {
+    public static counter: number = 0;
+    public name: string = 'Logger';
+
+    constructor() {
+      Logger.counter++;
+    }
+  }
+
+  class Connection {
+    public static counter: number = 0;
+    public name: string = 'Connection';
+
+    constructor() {
+      Connection.counter++;
+    }
+  }
+
+  @inject(Connection, Logger)
+  class App {
+    constructor(public connection: Promise<Connection>, public logger: Promise<Logger>) {
+    }
+  }
+
+  class Config {
+    @singleton(Logger)
+    public getLogger(): Promise<Logger> {
+      return Promise.resolve(new Logger());
+    }
+
+    @singleton(Connection)
+    public getConnection(): Promise<Connection> {
+      return Promise.resolve(new Connection());
+    }
+  }
+
+  before(() => {
+    Logger.counter = 0;
+    Connection.counter = 0;
+  });
+
+  container = new Container();
+  beforeEach(() => {
+    app = container.get(App);
+  });
+
+  it('should resolve asynchronously', () => {
+    assert.eventually.instanceOf(app.logger, Logger, 'app.logger should be an instance of Logger');
+    assert.eventually.instanceOf(app.connection, Connection, 'app.connection should be an instance of Connection');
+  });
+});
+
+describe('Config class inject', () => {
+  let container: Container;
+  let app: App;
+
+  @autoinject()
+  class App {
+    constructor(public hello: Hello) {
+    }
+  }
+
+  container = new Container();
+  beforeEach(() => {
+    app = container.get(App);
+  });
+
+  it('Should resolve from config class', () => {
+    assert.isOk(app.hello.msg === 'Hello!', `should be 'Hello!'`);
   });
 });

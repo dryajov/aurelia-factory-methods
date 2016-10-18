@@ -4,7 +4,7 @@ This module allows using the `@transient` and `@singleton` decorators on class m
 
 ## What's the use case?
 
-The main use case is creating configuration classes that allow creating dependencies implicitly through factory methods, rather than explicitly using the constructor.
+The main use case is creating configuration classes that allow registering dependencies implicitly through factory methods, rather than explicitly using the constructor.
 
 Consider the following example:
 
@@ -44,7 +44,7 @@ export class Config {
 }
 ```
 
-In the above snippet, we have a config class that registers a `Logger` in the constructor and an application that consumes the logger, however note the fact that we have to explicitly request the config class. This creates tight coupling between the consuming app and the configuration class. This isn't a big issue when your configuration is contained within an app, but it is, when you're trying to consume third party modules that provide their own configuration. The fact that you have to _know_ which class to request as opposed to the class running implicitly as part of the import process of a module creates this tight coupling and makes distributing modules that provide configuration through DI that much harder.
+In the above snippet, we have a config class that registers a `Logger` in the constructor and an `App` that consumes the logger, however note the fact that we have to explicitly request the config class. This creates tight coupling between the consuming app and the configuration class. This isn't a big issue when your configuration is contained within an app, but it is, when you're trying to consume third party modules that provide their own configuration. The fact that you have to _know_ which class to request as opposed to the class running implicitly as part of the import process of a module creates this tight coupling and makes distributing modules that provide configuration through DI that much harder.
 
 A better approach is having the configuration class provide dependencies through factory methods, this removes the need to _explicitly_ request the configuration class, and instead, running one of the decorators `@singleton` or `@transient` as part of the import process of the third party module, should be enough to register the required dependencies. E.g:
 
@@ -85,6 +85,8 @@ export class Config {
 }
 
 ````
+
+Note the absense of an explicit `Config` class, instead _the dependency_ (`Logger`) is requested, which triggers its registration with the container in an implicit manner.
 
 ## API
 

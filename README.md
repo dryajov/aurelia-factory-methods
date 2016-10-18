@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/dryajov/aurelia-factory-methods/tree/master.svg?style=svg)](https://circleci.com/gh/dryajov/aurelia-factory-methods/tree/master)
 
-This module allows using the `@transient` and `@singleton` decorators on class methods, which in turn allows using factories to create dependencies that decouple registration.
+This module allows using the `@transient` and `@singleton` decorators on class methods, which in turn allows using factories to create dependencies in a decoupled way.
 
 ## What's the use case?
 

@@ -1,7 +1,7 @@
 import {
   Container,
   Resolver,
-  Registration as AureliaRegistration,
+  Registration,
   registration as aureliaRegistration,
 } from 'aurelia-dependency-injection';
 import {metadata} from 'aurelia-metadata';
@@ -12,15 +12,16 @@ import {FactoryMethod} from './resolvers';
  * Decorator: Specifies a custom registration strategy for the decorated class/function.
  */
 export function registration(value: Registration & {key: any}): any {
-  return function (target: any, key: any, descriptor: PropertyDescriptor) {
+  return (target: any, key: any, descriptor: PropertyDescriptor) => {
     if ((key && key.length > 0) && descriptor) {
-      value.factoryFn = descriptor.value;
-      value.targetClass = target;
       // TODO: move key to metadata
-      target = value.key || metadata.get('design:returntype', target, key);
+      let configClass: any = target;
+      target = value.key instanceof Object ? value.key : metadata.get('design:returntype', target, key);
+      target.factoryFn = descriptor.value;
+      target.configClass = configClass;
     }
 
-    return aureliaRegistration(value as AureliaRegistration)(target);
+    return aureliaRegistration(value)(target);
   };
 }
 
@@ -39,33 +40,9 @@ export function singleton(keyOrRegisterInChild?: any, registerInChild: boolean =
 }
 
 /**
- * Customizes how a particular function is resolved by the Container.
- */
-export abstract class Registration {
-  /**
-   * Factory function invoked instead of the target
-   */
-  public factoryFn: Function;
-
-  /**
-   *
-   */
-  public targetClass: Function;
-
-  /**
-   * Called by the container to register the resolver.
-   * @param container The container the resolver is being registered with.
-   * @param key The key the resolver should be registered as.
-   * @param fn The function to create the resolver for.
-   * @return The resolver that was registered.
-   */
-  public abstract registerResolver(container: Container, key: any, fn: Function): Resolver;
-}
-
-/**
  * Used to allow functions/classes to indicate that they should be registered as transients with the container.
  */
-export class TransientRegistration extends Registration {
+export class TransientRegistration implements Registration {
   /** @internal */
   public key: any;
 
@@ -74,7 +51,6 @@ export class TransientRegistration extends Registration {
    * @param key The key to register as.
    */
   constructor(key?: any) {
-    super();
     this.key = key;
   }
 
@@ -86,19 +62,20 @@ export class TransientRegistration extends Registration {
    * @return The resolver that was registered.
    */
   public registerResolver(container: Container, key: any, fn: Function): Resolver {
-    if (this.factoryFn) {
-      return container.registerResolver(this.key || key,
-        new FactoryMethod(this.key, this.factoryFn, this.targetClass, true));
+    key = this.key || key;
+    if (key.factoryFn) {
+      return container.registerResolver(key,
+        new FactoryMethod(key, key.factoryFn, true));
     }
 
-    return container.registerTransient(this.key || key, fn);
+    return container.registerTransient(key, fn);
   }
 }
 
 /**
  * Used to allow functions/classes to indicate that they should be registered as singletons with the container.
  */
-export class SingletonRegistration extends Registration {
+export class SingletonRegistration implements Registration {
   /** @internal */
   public key: any;
 
@@ -111,8 +88,6 @@ export class SingletonRegistration extends Registration {
    * @param registerInChild Should it be registered in the root or child container
    */
   constructor(keyOrRegisterInChild?: any, registerInChild: boolean = false) {
-    super();
-
     if (typeof keyOrRegisterInChild === 'boolean') {
       this.registerInChild = keyOrRegisterInChild;
     } else {
@@ -129,14 +104,15 @@ export class SingletonRegistration extends Registration {
    * @return The resolver that was registered.
    */
   public registerResolver(container: Container, key: any, fn: Function | Resolver): Resolver {
-    if (this.factoryFn) {
+    key = this.key || key;
+    if (key.factoryFn) {
       return this.registerInChild
-        ? container.registerResolver(this.key || key, new FactoryMethod(key, this.factoryFn, this.targetClass))
-        : container.root.registerResolver(this.key || key, new FactoryMethod(key, this.factoryFn, this.targetClass));
+        ? container.registerResolver(key, new FactoryMethod(key, key.factoryFn))
+        : container.root.registerResolver(this.key || key, new FactoryMethod(key, key.factoryFn));
     } else {
       return this.registerInChild
-        ? container.registerSingleton(this.key || key, fn as Function)
-        : container.root.registerSingleton(this.key || key, fn as Function);
+        ? container.registerSingleton(key, fn as Function)
+        : container.root.registerSingleton(key, fn as Function);
     }
   }
 }

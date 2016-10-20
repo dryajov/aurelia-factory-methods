@@ -18,8 +18,8 @@ export class FactoryMethod implements Resolver {
    */
   constructor(private key: any,
               private factoryMethod: Function & {inject?: Array<any> | Function},
-              private targetClass: Function,
-              private transient: boolean = false) {
+              private transient: boolean = false,
+              private configClass?: Function) {
   }
 
   /**
@@ -35,14 +35,15 @@ export class FactoryMethod implements Resolver {
         this.factoryMethod.inject.call(undefined) : this.factoryMethod.inject;
     } else {
       dependencies = metadata.getOwn(metadata.paramTypes,
-          this.targetClass, this.factoryMethod.name) as Array<any> || _emptyParameters;
+          key.configClass, key.factoryFn.name) as Array<any> || _emptyParameters;
     }
 
     let resolvedDependencies: any[] | undefined = dependencies.length > 0 ?
       dependencies.map(dependency => container.get(dependency)) : undefined;
 
     if (this.transient || !this.instance) {
-      this.instance = this.factoryMethod.apply(undefined, resolvedDependencies);
+      let configInstace: any = container.get(key.configClass);
+      this.instance = key.factoryFn.apply(configInstace, resolvedDependencies);
     }
 
     return this.instance;

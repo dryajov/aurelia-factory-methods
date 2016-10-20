@@ -41,6 +41,7 @@ describe('Singleton Registration', () => {
     }
   }
 
+  @autoinject()
   class Config {
     @singleton()
     public getLogger(): Logger {
@@ -102,6 +103,7 @@ describe('Transient Registration', () => {
     }
   }
 
+  @autoinject()
   class Config {
     @transient()
     public getLogger(): Logger {
@@ -171,6 +173,7 @@ describe('Dependencies in factory methods', () => {
     }
   }
 
+  @autoinject()
   class Config {
     @singleton()
     public getLogger(): Logger {
@@ -235,6 +238,7 @@ describe('Override key', () => {
     }
   }
 
+  @autoinject()
   class Config {
     @singleton(AnotherLogger)
     public getLogger(): Logger {
@@ -291,6 +295,7 @@ describe('Promise inject', () => {
     }
   }
 
+  @autoinject()
   class Config {
     @singleton(Logger)
     public getLogger(): Promise<Logger> {
@@ -336,5 +341,79 @@ describe('Config class inject', () => {
 
   it('Should resolve from config class', () => {
     assert.isOk(app.hello.msg === 'Hello!', `should be 'Hello!'`);
+  });
+});
+
+describe('Symbol Registration', () => {
+  let container: Container;
+  let app: App;
+  const connectionSymbol: symbol = Symbol('connection');
+  const loggerSymbol: symbol = Symbol('logger');
+
+  class Logger {
+    public static counter: number = 0;
+    public name: string = 'Logger';
+
+    constructor() {
+      Logger.counter++;
+    }
+  }
+
+  class MyLogger extends Logger {
+    constructor() {
+      super();
+      this.name = 'my-logger';
+    }
+  }
+
+  class Connection {
+    public static counter: number = 0;
+    public name: string = 'Connection';
+
+    constructor() {
+      Connection.counter++;
+    }
+  }
+
+  class MyConnection extends Connection {
+    constructor() {
+      super();
+      this.name = 'my-connection';
+    }
+  }
+
+  @inject(connectionSymbol, loggerSymbol)
+  class App {
+    constructor(public connection: Connection,
+                public logger: Logger) {
+    }
+  }
+
+  @autoinject()
+  class Config {
+    @singleton(loggerSymbol)
+    public getLogger(): Logger {
+      return new MyLogger();
+    }
+
+    @singleton(connectionSymbol)
+    public getConnection(): Connection {
+      return new MyConnection();
+    }
+  }
+
+  before(() => {
+    Logger.counter = 0;
+    Connection.counter = 0;
+  });
+
+  container = new Container();
+  beforeEach(() => {
+    app = container.get(App);
+  });
+
+  it('should inject singleton factory methods', () => {
+    assert.instanceOf(app.logger, Logger, 'app.logger should be an instance of Logger');
+    assert.instanceOf(app.connection, Connection, 'app.connection should be an instance of Connection');
   });
 });

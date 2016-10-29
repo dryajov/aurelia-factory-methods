@@ -11,7 +11,8 @@
   "scripts": {
     "build": "node_modules/.bin/tsc",
     "clean": "rm -rf lib/*.{map,d.ts,js} test/*.{map,d.ts,js}",
-    "test": "npm run clean && npm run build && ./node_modules/.bin/mocha test/*.spec.js"
+    "test": "npm run clean && npm run build && ./node_modules/.bin/mocha test/*.spec.js",
+    "prepublish": "npm run test"
   },
   "author": "Dmitiry Ryajov <dryajov@gmail.com>",
   "license": "MIT",

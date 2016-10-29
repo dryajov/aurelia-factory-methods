@@ -5,7 +5,6 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
-      // unfortunately dom is required for @types/Sinon
       "dom",
       "es6"
     ],

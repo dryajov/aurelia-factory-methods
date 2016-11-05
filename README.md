@@ -4,7 +4,7 @@
 
 This module allows using the `@transient` and `@singleton` decorators on class methods, which in turn allows using factories to create dependencies in a decoupled way.
 
-For those familiar with the Java Spring DI, this module tries to emulate the @Bean annotation semantics.
+This module tries to emulate the @Bean annotation semantics from the Java Spring framework.
 
 ## What's the use case?
 
